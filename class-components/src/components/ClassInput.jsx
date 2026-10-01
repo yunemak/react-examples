@@ -13,11 +13,16 @@ class ClassInput extends Component {
     this.state = {
       todos: ['Just some demo tasks', 'As an example'],
       inputVal: '',
+      editingTodo: null,
+      editValue: '',
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
+    this.handleEditChange = this.handleEditChange.bind(this);
+    this.handleResubmit = this.handleResubmit.bind(this);
   }
 
   handleInputChange(e) {
@@ -42,6 +47,26 @@ class ClassInput extends Component {
     }));
   }
 
+  handleEdit(todoToBeEditted) {
+    this.setState({ editingTodo: todoToBeEditted, editValue: todoToBeEditted });
+  }
+
+  handleEditChange(e) {
+    this.setState({
+      editValue: e.target.value,
+    });
+  }
+
+  handleResubmit() {
+    this.setState((state) => ({
+      todos: state.todos.map((todo) =>
+        todo === state.editingTodo ? state.editValue : todo,
+      ),
+      editingTodo: null,
+      editValue: '',
+    }));
+  }
+
   render() {
     return (
       <section>
@@ -61,16 +86,29 @@ class ClassInput extends Component {
         {/* The list of all the To-Do's, displayed */}
         <Count count={this.state.todos.length} />
         <ul>
-          {this.state.todos.map((todo) => (
-            <div key={todo}>
-              <li>{todo}</li>
-              <button
-                key={todo}
-                type="button"
-                onClick={() => this.handleDelete(todo)}
-              >
+          {this.state.todos.map((todo, index) => (
+            <div key={index}>
+              {this.state.editingTodo === todo ? (
+                <input
+                  type="text"
+                  value={this.state.editValue}
+                  onChange={this.handleEditChange}
+                />
+              ) : (
+                <li>{todo}</li>
+              )}
+              <button type="button" onClick={() => this.handleDelete(todo)}>
                 Delete
               </button>
+              {this.state.editingTodo === todo ? (
+                <button type="button" onClick={this.handleResubmit}>
+                  Resubmit
+                </button>
+              ) : (
+                <button type="button" onClick={() => this.handleEdit(todo)}>
+                  Edit
+                </button>
+              )}
             </div>
           ))}
         </ul>
